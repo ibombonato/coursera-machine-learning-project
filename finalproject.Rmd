@@ -16,9 +16,9 @@ After load the data and take a look on it, I noted that are 100 variables missin
 
 Since we are not interest in which subject did the exercise, I removed all variables that are related to the subject.
 
-After that, I take a look at the correlation of the 52 variables left and cut off all with more then 0.7 absolute value. So I ended with 33 variables and build the model around them.
+After that, I take a look at the correlation of the 52 variables left and cut off all with more then 0.7 absolute value of correlation. So I ended with 33 variables and build the model around them.
 
-### Model Bulding
+### Model Building
 
 After the data was cleaned, its time to build a model.
 
@@ -41,13 +41,13 @@ test <- data[-inTrain,]
 modFit <- train(classe ~ ., data = train, method="rf", prox=TRUE)
 ```
 
-After we fit the model, here are the results of it:
+After I fit the model, here are the results of it:
 
 ```{r}
 modFit
 ```
 
-We use the default bootstrap resampling to validate the data and avoid overfit.
+I use the default bootstrap resampling to validate the data and avoid overfit.
 
 According to John Kuhn, creator of the caret package, this procedure has low variance but non–zero bias when compared to K–fold Cross Validation.
 
@@ -55,11 +55,11 @@ You can find more about in at this paper [Predictive Modeling with R and the car
 
 We can see that it has an accuracy of ~93%
 
-Now we will validate the model using the test data and see the results using the confusinMatrix function:
+Now we will validate the model using the test data and see the results using the confusionMatrix function:
 
 ```{r}
 predictions <- predict(modFit, newdata = test)
 confusionMatrix(predictions, test$classe)
 ```
 
-And we can see that the accuracy was pretty consistent with our training model.
+And we can see that the accuracy was pretty consistent with our training model results.
