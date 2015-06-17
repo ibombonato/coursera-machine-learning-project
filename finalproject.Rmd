@@ -47,13 +47,13 @@ After I fit the model, here are the results of it:
 modFit
 ```
 
-I use the default bootstrap resampling to validate the data and avoid overfit.
+I use the default bootstrap resampling to validate the data and avoid overfit besides K–fold Cross Validation.
 
-According to John Kuhn, creator of the caret package, this procedure has low variance but non–zero bias when compared to K–fold Cross Validation.
+According to John Kuhn, creator of the caret package, this procedure, bootstrap resampling, has low variance but non–zero bias when compared to K–fold Cross Validation.
 
 You can find more about in at this paper [Predictive Modeling with R and the caret Package](http://www.edii.uclm.es/~useR-2013/Tutorials/kuhn/user_caret_2up.pdf)
 
-We can see that it has an accuracy of ~93%
+We can see that the model has an accuracy of ~93% and Kappa value of ~0.92 with is considered pretty good. The Accuracy and Kappa Standard Deviation is low, so the error rate
 
 Now we will validate the model using the test data and see the results using the confusionMatrix function:
 
