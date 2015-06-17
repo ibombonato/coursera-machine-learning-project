@@ -1,0 +1,65 @@
+---
+title: "Pratical Machine Learning"
+author: "Icaro C. Bombonato"
+date: "June 2015"
+output: html_document
+---
+
+### Synopsis
+Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible to collect a large amount of data about personal activity relatively inexpensively. These type of devices are part of the quantified self movement – a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. One thing that people regularly do is quantify how much of a particular activity they do, but they rarely quantify how well they do it. 
+
+In this project/analysis, our goal is to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants and predict the manner in which they did the exercise.
+
+### Cleaning the data
+
+After load the data and take a look on it, I noted that are 100 variables missing in ~97% of the data. Since 3% is a very small set of data to make predictions, I remove these variables.
+
+Since we are not interest in which subject did the exercise, I removed all variables that are related to the subject.
+
+After that, I take a look at the correlation of the 52 variables left and cut off all with more then 0.7 absolute value. So I ended with 33 variables and build the model around them.
+
+### Model Bulding
+
+After the data was cleaned, its time to build a model.
+
+I used the caret package for building the model, training the data, predict new cases and estimate the accuracy of the model.
+
+For this classification problem, I choose to use the Random Forest algorithm.
+
+I used the createDataPartition() function to split the data in two separated samples and used one for training the data and the other to validate the results. That way, we can see how the model performs in new data and detect any problem before put it on production.
+
+A sample code of how the model was built are show bellow:
+
+```{r, eval=FALSE}
+# create training set indexes with 75% of data
+inTrain <- createDataPartition(y=data$classe,p=0.75, list=FALSE)
+# subset data to training
+train <- data[inTrain,]
+# subset data to test
+test <- data[-inTrain,]
+
+modFit <- train(classe ~ ., data = train, method="rf", prox=TRUE)
+```
+
+After we fit the model, here are the results of it:
+
+```{r}
+modFit
+```
+
+We use the default bootstrap resampling to validate the data and avoid overfit.
+
+According to John Kuhn, creator of the caret package, this procedure has low variance but non–zero bias when compared to K–fold Cross Validation.
+
+You can find more about in at this paper [Predictive Modeling with R and the caret Package](http://www.edii.uclm.es/~useR-2013/Tutorials/kuhn/user_caret_2up.pdf)
+
+We can see that it has an accuracy of ~93%
+
+Now we will validate the model using the test data and see the results using the confusinMatrix function:
+
+```{r}
+predictions <- predict(modFit, newdata = test)
+confusionMatrix(predictions, test$classe)
+```
+
+And we can see that the accuracy was pretty consistent with our training model.
