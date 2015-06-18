@@ -72,7 +72,7 @@ Accuracy was used to select the optimal model using  the largest value.
 The final value used for the model was mtry = 2.
 ```
 
-I used the default **bootstrap resampling to cross validate** the data and avoid overfit besides K–fold Cross Validation.
+I used the default **Bootstrap Resampling** technique to **Cross Validate** the data besides K–fold Cross Validation.
 
 According to John Kuhn, creator of the caret package, this procedure, bootstrap resampling, has low variance but non–zero bias when compared to K–fold Cross Validation.
 
@@ -80,7 +80,7 @@ You can find more about it at this paper [Predictive Modeling with R and the car
 
 We can see that the model has an accuracy of ~93.8% and Kappa value of ~0.92 wich is considered pretty good.
 
-Since the model uses resampling, we can take a look of how it estimates the error in unseen data, through the Out Of Bag (OOB) estimate of error, in this case **5.02%**
+Since the model uses resampling, we can take a look of how it **estimates out of sample error** in unseen data, through the Out Of Bag (OOB) estimate of error, in this case **5.02%**
 
 ```{r, eval = FALSE}
 > modelFit.Best$finalModel
