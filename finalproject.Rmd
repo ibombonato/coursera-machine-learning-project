@@ -33,7 +33,7 @@ the performance change are VERY small. And then, I plot it to see the results an
 
 ![FeatureSelection](featureSelection.png)
 
-After taking a look at the graph, I choose to pick 10 variables to make the final model. The variables were selected using the **varImp(modelFit)** function, that list the variables by order of importance to the model.
+After taking a look at the graph, I choosed 10 variables to make the final model. The variables were selected using the **varImp(modelFit)** function, that list the variables by order of importance to the model.
 
 And then I made my final model:
 
@@ -72,15 +72,15 @@ Accuracy was used to select the optimal model using  the largest value.
 The final value used for the model was mtry = 2.
 ```
 
-I use the default **bootstrap resampling to cross validate** the data and avoid overfit besides K–fold Cross Validation.
+I used the default **bootstrap resampling to cross validate** the data and avoid overfit besides K–fold Cross Validation.
 
 According to John Kuhn, creator of the caret package, this procedure, bootstrap resampling, has low variance but non–zero bias when compared to K–fold Cross Validation.
 
 You can find more about it at this paper [Predictive Modeling with R and the caret Package](http://www.edii.uclm.es/~useR-2013/Tutorials/kuhn/user_caret_2up.pdf)
 
-We can see that the model has an accuracy of ~93.8% and Kappa value of ~0.92 with is considered pretty good.
+We can see that the model has an accuracy of ~93.8% and Kappa value of ~0.92 wich is considered pretty good.
 
-Since the model uses resampling, we can take a look of how it estimates the error in unseen data, thought the Out Of Bag (OOB) estimate of error, in this case **5.02%**
+Since the model uses resampling, we can take a look of how it estimates the error in unseen data, through the Out Of Bag (OOB) estimate of error, in this case **5.02%**
 
 ```{r, eval = FALSE}
 > modelFit.Best$finalModel
@@ -143,7 +143,7 @@ And we can see that the accuracy was even better with our test data, confirming 
 
 ### Disclaimer
 
-Since the assigment tells the sentence bellow and the work should not be reproducible, I omit most of the code for cleaning the data and some part of my analysis, but I tryed to make it the clearest that I could.
+Since the assignment tells the sentence bellow and the work should not be reproducible, I omitted most of the code for cleaning the data and some part of my analysis,  but I tried to explain it the best that I could.
 
 > **Reproducibility**  
 > Due to security concerns with the exchange of R code, your code will not be run during the evaluation  by your classmates. Please be sure that if they download the repo, they will be able to view the compiled HTML version of your analysis.
