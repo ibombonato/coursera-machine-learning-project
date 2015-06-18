@@ -28,11 +28,21 @@ For this classification problem, I choose to use the Random Forest algorithm.
 
 I used the createDataPartition() function to split the data in two separated samples and used one for training the data and the other to validate the results. That way, we can see how the model performs in new data and detect any problem before put it on production.
 
-A sample code of how the model was built are show bellow:
+I started with a very small subset of the data to train the model faster and pick the best one, after that, I trained the best model using 50% of the data, but the performance difference was very small.
+
+I used the rfeControl and rfe function of the caret package [Recursive Feature Elimination](http://topepo.github.io/caret/featureselection.html) to rank the variables and choose a smaller model, since complex models take a long time to run and sometimes 
+the performance change are VERY small. And them, I plot it to see the results and pick the important variables.
+
+![Feature Selection](featureSelection.png)
+
+```{r, eval = FALSE}
+
+```
+
 
 ```{r, eval=FALSE}
-# create training set indexes with 75% of data
-inTrain <- createDataPartition(y=data$classe,p=0.75, list=FALSE)
+# create training set indexes with 10% of data
+inTrain <- createDataPartition(y=data$classe,p=0.10, list=FALSE)
 # subset data to training
 train <- data[inTrain,]
 # subset data to test
@@ -41,7 +51,7 @@ test <- data[-inTrain,]
 modFit <- train(classe ~ ., data = train, method="rf", prox=TRUE)
 ```
 
-After I fit the model, here are the results of it:
+After that, I take a look at the variables importance on the model 
 
 ```{r}
 modFit
