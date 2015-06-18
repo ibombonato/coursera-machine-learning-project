@@ -116,11 +116,11 @@ Resampling results across tuning parameters:
 
 Accuracy was used to select the optimal model using  the largest value.
 The final value used for the model was mtry = 2.</code></pre>
-<p>I used the default <strong>bootstrap resampling to cross validate</strong> the data and avoid overfit besides K–fold Cross Validation.</p>
+<p>I used the default <strong>Bootstrap Resampling</strong> technique to <strong>Cross Validate</strong> the data besides K–fold Cross Validation.</p>
 <p>According to John Kuhn, creator of the caret package, this procedure, bootstrap resampling, has low variance but non–zero bias when compared to K–fold Cross Validation.</p>
 <p>You can find more about it at this paper <a href="http://www.edii.uclm.es/~useR-2013/Tutorials/kuhn/user_caret_2up.pdf">Predictive Modeling with R and the caret Package</a></p>
 <p>We can see that the model has an accuracy of ~93.8% and Kappa value of ~0.92 wich is considered pretty good.</p>
-<p>Since the model uses resampling, we can take a look of how it estimates the error in unseen data, through the Out Of Bag (OOB) estimate of error, in this case <strong>5.02%</strong></p>
+<p>Since the model uses resampling, we can take a look of how it <strong>estimates out of sample error</strong> in unseen data, through the Out Of Bag (OOB) estimate of error, in this case <strong>5.02%</strong></p>
 <pre class="r"><code>&gt; modelFit.Best$finalModel
 
 Call:
