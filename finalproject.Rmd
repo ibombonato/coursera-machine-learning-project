@@ -140,3 +140,16 @@ Balanced Accuracy      0.9803   0.9522   0.9563   0.9598   0.9881
 ```
 
 And we can see that the accuracy was even better with our test data, confirming the model statistics.
+
+### Disclaimer
+
+Since the assigment tells the sentence bellow and the work should not be reproducible, I omit most of the code for cleaning the data and some part of my analysis, but I tryed to make it the clearest that I could.
+
+> **Reproducibility**  
+> Due to security concerns with the exchange of R code, your code will not be run during the evaluation  by your classmates. Please be sure that if they download the repo, they will be able to view the compiled HTML version of your analysis.
+
+You can access the compiled html at my github repo for this project:  
+http://github.com/ibombonato/coursera-machine-learning-project
+
+Or see it directly on the browser:  
+http://ibombonato.github.io/coursera-machine-learning-project/
