@@ -83,94 +83,95 @@ img {
 <p>I used the <a href="http://topepo.github.io/caret/">caret package</a> for building the model, training the data, predict new cases and estimate the accuracy of the model.</p>
 <p>For this classification problem, I choose to use the Random Forest algorithm.</p>
 <p>I used the <strong>createDataPartition()</strong> function to split the data in two separated samples and used one for training the data and the other to validate the results. That way, we can see how the model performs in new data and detect any problem before put it on production.</p>
-<p>I started with a very small subset of the data to train the model faster, 10%, and pick the best one, after that, I trained the best model using 50% of the data to get a better accuracy.</p>
-<p>I used the <strong>rfeControl</strong> and <strong>rfe</strong> function, <a href="http://topepo.github.io/caret/featureselection.html">Recursive Feature Elimination</a>, to train the first model and rank the variables, since complex models take a long time to run and sometimes the performance change are VERY small. And then, I plot it to see the results and pick the most important variables.</p>
-<p><img src="data:image/png;base64,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" alt="FeatureSelection" /></p>
+<p>I started with a very small subset of the data to train the model faster, 10%, and pick the best one, after that, I trained the best model using 30% of the data to get a better accuracy.</p>
+<p>I used the <strong>rfeControl</strong> and <strong>rfe</strong> function, <a href="http://topepo.github.io/caret/featureselection.html">Recursive Feature Elimination</a>, to train the first model and rank the variables, since complex models take a long time to run and sometimes the performance change are VERY small. And then, I plot the Accuracy x Variables to see the results and I choose to pick the 10 most important variables.</p>
+<p><img src="data:image/png;base64,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" alt="FeatureSelection" /></p>
 <p>After taking a look at the graph, I choosed 10 variables to make the final model. The variables were selected using the <strong>varImp(modelFit)</strong> function, that list the variables by order of importance to the model.</p>
 <p>And then I made my final model:</p>
-<pre class="r"><code>modelFit.Best &lt;- train(classe ~ 
-                         magnet_dumbbell_z + magnet_belt_z + pitch_forearm +
-                         roll_dumbbell + roll_forearm + gyros_belt_z +
-                         accel_forearm_x + yaw_dumbbell + roll_arm +
-                         gyros_dumbbell_y, data = train, 
+<pre class="r"><code>modelFit.Best &lt;- train(classe ~ magnet_dumbbell_z    +
+                           roll_dumbbell        +
+                           pitch_forearm        +
+                           magnet_belt_z        +
+                           roll_forearm         +
+                           gyros_belt_z         +
+                           magnet_arm_x         +
+                           gyros_dumbbell_y     +
+                           total_accel_belt     +
+                           accel_forearm_x, data = train, 
                      method=&quot;rf&quot;, prox = TRUE, 
                      allowParallel = TRUE)</code></pre>
 <p>And the results for the model are bellow:</p>
-<pre class="r"><code>Random Forest
+<pre class="r"><code>Random Forest 
 
-7850 samples
-  32 predictor
-   5 classes: 'A', 'B', 'C', 'D', 'E'
+5889 samples
+  33 predictor
+   5 classes: 'A', 'B', 'C', 'D', 'E' 
 
 No pre-processing
-Resampling: Bootstrapped (25 reps)
+Resampling: Bootstrapped (25 reps) 
 
-Summary of sample sizes: 7850, 7850, 7850, 7850, 7850, 7850, ...
+Summary of sample sizes: 5889, 5889, 5889, 5889, 5889, 5889, ... 
 
 Resampling results across tuning parameters:
 
-  mtry  Accuracy   Kappa      Accuracy SD  Kappa SD  
-   2    0.9383546  0.9219512  0.003503852  0.004448852
-   6    0.9305423  0.9120964  0.004701773  0.005988421
-  10    0.9148396  0.8922452  0.008830544  0.011210149
+  mtry  Accuracy   Kappa      Accuracy SD  Kappa SD   
+   2    0.9287708  0.9098260  0.005616632  0.007082752
+   6    0.9208420  0.8998129  0.006531468  0.008228253
+  10    0.9088271  0.8846037  0.007046107  0.008899502
 
 Accuracy was used to select the optimal model using  the largest value.
-The final value used for the model was mtry = 2.</code></pre>
+The final value used for the model was mtry = 2. </code></pre>
 <p>I used the default <strong>Bootstrap Resampling</strong> technique to <strong>Cross Validate</strong> the data besides K–fold Cross Validation.</p>
 <p>According to John Kuhn, creator of the caret package, this procedure, bootstrap resampling, has low variance but non–zero bias when compared to K–fold Cross Validation.</p>
 <p>You can find more about it at this paper <a href="http://www.edii.uclm.es/~useR-2013/Tutorials/kuhn/user_caret_2up.pdf">Predictive Modeling with R and the caret Package</a></p>
-<p>We can see that the model has an accuracy of ~93.8% and Kappa value of ~0.92 wich is considered pretty good.</p>
-<p>Since the model uses resampling, we can take a look of how it <strong>estimates out of sample error</strong> in unseen data, through the Out Of Bag (OOB) estimate of error, in this case <strong>5.02%</strong></p>
-<pre class="r"><code>&gt; modelFit.Best$finalModel
-
-Call:
-randomForest(x = x, y = y, mtry = param$mtry, proximity = TRUE, allowParallel = TRUE)
+<p>We can see that the model has an <strong>Accuracy of ~93% and Kappa value of ~0.91</strong> wich is considered pretty good.</p>
+<p>Since the model uses resampling, we can take a look of how it <strong>estimates out of sample error</strong> in unseen data, through the Out Of Bag (OOB) estimate of error, in this case <strong>6.25%</strong></p>
+<pre class="r"><code>Call:
+ randomForest(x = x, y = y, mtry = param$mtry, proximity = TRUE,      allowParallel = TRUE) 
                Type of random forest: classification
                      Number of trees: 500
 No. of variables tried at each split: 2
 
-        **OOB estimate of  error rate: 5.02%**
+        OOB estimate of  error rate: 6.25%
 Confusion matrix:
-     A    B    C    D    E class.error
-A 2202   14    6    9    1  0.01344086
-B   69 1384   49   12    5  0.08887426
-C    5   54 1258   47    5  0.08108108
-D    7    7   60 1205    8  0.06371406
-E    4    5   11   16 1407  0.02494802</code></pre>
+     A    B   C   D    E class.error
+A 1623   16  12  17    6  0.03046595
+B   44 1027  53  10    6  0.09912281
+C   22   49 940  14    2  0.08471276
+D   22    5  46 885    7  0.08290155
+E    4    5  13  15 1046  0.03416436</code></pre>
 <p>We can validate the model accuracy using the test data and see the results using the confusionMatrix function:</p>
-<pre class="r"><code>&gt; confusionMatrix(predict(modelFit.Best, newdata = test), test$classe)
-
-Confusion Matrix and Statistics
+<pre class="r"><code>Confusion Matrix and Statistics
 
           Reference
 Prediction    A    B    C    D    E
-         A 3263   85   23    7    3
-         B   41 2090   65   10    9
-         C   13   75 1917  103   14
-         D   18   25   42 1794   17
-         E   13    3    6   15 2121
+         A 3813  113   36   40   10
+         B   42 2388   78   23   16
+         C   25  105 2253  143   40
+         D   15   44   20 2013   33
+         E   11    7    8   32 2425
 
 Overall Statistics
-                                       
-               Accuracy : 0.9501       
-                 95% CI : (0.946, 0.954)
-    No Information Rate : 0.2844       
-    P-Value [Acc &gt; NIR] : &lt; 2.2e-16    
-                                       
-                  Kappa : 0.9369       
-Mcnemar s Test P-Value : 9.171e-11    
+                                          
+               Accuracy : 0.9388          
+                 95% CI : (0.9346, 0.9427)
+    No Information Rate : 0.2844          
+    P-Value [Acc &gt; NIR] : &lt; 2.2e-16       
+                                          
+                  Kappa : 0.9225          
+ Mcnemar s Test P-Value : &lt; 2.2e-16       
 
 Statistics by Class:
 
                      Class: A Class: B Class: C Class: D Class: E
-Sensitivity            0.9746   0.9175   0.9338   0.9300   0.9801
-Specificity            0.9860   0.9868   0.9789   0.9896   0.9961
-Pos Pred Value         0.9651   0.9436   0.9034   0.9462   0.9829
-Neg Pred Value         0.9899   0.9803   0.9859   0.9863   0.9955
+Sensitivity            0.9762   0.8988   0.9407   0.8943   0.9608
+Specificity            0.9797   0.9856   0.9724   0.9902   0.9948
+Pos Pred Value         0.9504   0.9376   0.8780   0.9473   0.9766
+Neg Pred Value         0.9904   0.9760   0.9873   0.9795   0.9912
 Prevalence             0.2844   0.1935   0.1744   0.1639   0.1838
-Detection Rate         0.2772   0.1775   0.1628   0.1524   0.1802
-Detection Prevalence   0.2872   0.1882   0.1803   0.1611   0.1833
-Balanced Accuracy      0.9803   0.9522   0.9563   0.9598   0.9881</code></pre>
+Detection Rate         0.2777   0.1739   0.1641   0.1466   0.1766
+Detection Prevalence   0.2921   0.1855   0.1868   0.1547   0.1808
+Balanced Accuracy      0.9780   0.9422   0.9566   0.9423   0.9778</code></pre>
 <p>And we can see that the accuracy was even better with our test data, confirming the model statistics.</p>
 </div>
 <div id="disclaimer" class="section level3">

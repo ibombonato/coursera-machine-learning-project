@@ -5,6 +5,124 @@ date: "June 2015"
 output: html_document
 ---
 
+```{r, eval = FALSE, echo = FALSE}
+# Code Analysis:
+library(doParallel)
+library(caret)
+
+#Read data
+data <- read.csv("pml-training.csv", header = TRUE, na.strings = c("", "NA"), stringsAsFactors = FALSE)
+
+#Take a look ate the data
+View(data)
+summary(data)
+
+# All NA in Column?
+SumNA <- sapply(data, function(x)sum(is.na(x)))
+#Drop all columns where NA is larger then 90% off the data
+colstoDrop <-names(SumNA[SumNA>19622 * .90]);   
+data <- data[,!names(data) %in% colstoDrop]
+
+# Verifying complete cases
+sum(complete.cases(data))
+sum(!complete.cases(data))
+
+# Looking and transforming the data
+str(data)
+data$classe <- as.factor(data$classe)
+
+#Drop columns related to the subject
+colstoDrop2 <-c("X","user_name",
+                "raw_timestamp_part_1",
+                "raw_timestamp_part_2",
+                "cvtd_timestamp", "new_window", "num_window"); 
+data <- data[,!names(data) %in% colstoDrop2]
+
+set.seed(23456)
+
+# create training set indexes with 10% of data
+inTrain <- createDataPartition(y=data$classe,p=0.1, list=FALSE)
+# subset data to training
+train <- data[inTrain,]
+# subset data to test
+test <- data[-inTrain,]
+
+#Remove high correlated data. > 70% correlation
+descrCor <-  cor(train[,-53])
+highlyCorDescr <- findCorrelation(descrCor, cutoff = .70)
+filteredDescr <- train[,-highlyCorDescr]
+descrCor2 <- cor(subset(filteredDescr, select =-c(classe)))
+
+#Removing unused variables from train and original data
+data <- data[,names(data) %in% c(colnames(descrCor2), "classe")]
+train <- train[,names(train) %in% c(colnames(descrCor2), "classe")]
+
+#Looking for NearZeroVariance data
+nzv <- nearZeroVar(train, saveMetrics= TRUE)
+nzv
+
+#Enable parallel
+cl <- makeCluster(detectCores())
+registerDoParallel(cl)
+# Feature Selection using cross validation
+control <- rfeControl(functions=rfFuncs, method="cv", number=5)
+# Run the RFE algorithm
+classeColumnIndex <- ncol(train)
+rfeResults <- rfe(train[,-classeColumnIndex], train[,c("classe")], 
+                  sizes=c(1:(classeColumnIndex-1)), 
+                  rfeControl=control)
+                  
+# Close parallel connections
+stopCluster(cl)
+
+# plot the results
+plot(rfeResults, type=c("g", "o"))
+
+# Looking at the top 10 variables
+head(varImp(rfeResults), 10)
+
+# create training set indexes with 30% of data.
+# You can take more than that, but due to time of training, I pick only 30%.
+# My first try with 75% took more than 8 hours...
+inTrain <- createDataPartition(y=data$classe,p=0.30, list=FALSE)
+# subset data to training
+train <- data[inTrain,]
+# subset data to test
+test <- data[-inTrain,]
+
+#Enable parallel
+cl <- makeCluster(detectCores())
+registerDoParallel(cl)
+
+# Make model with 10 best variables
+modelFit.Best <- train(classe ~ magnet_dumbbell_z    +
+                           roll_dumbbell        +
+                           pitch_forearm        +
+                           magnet_belt_z        +
+                           roll_forearm         +
+                           gyros_belt_z         +
+                           magnet_arm_x         +
+                           gyros_dumbbell_y     +
+                           total_accel_belt     +
+                           accel_forearm_x, data = train, 
+                     method="rf", prox = TRUE, 
+                     allowParallel = TRUE)
+
+# Close parallel connections
+stopCluster(cl)
+
+# Looking the results, error rate, accuracy, etc...
+modelFit.Best
+modelFit.Best$finalModel
+
+# Predict in new/unseen data. (test data)
+predictions <- predict(modelFit.Best, newdata = test)
+
+# Results in test data
+confusionMatrix(predictions, test$classe)
+```
+
+
 ### Synopsis
 Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible to collect a large amount of data about personal activity relatively inexpensively. These type of devices are part of the quantified self movement – a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. One thing that people regularly do is quantify how much of a particular activity they do, but they rarely quantify how well they do it. 
 
@@ -26,10 +144,10 @@ For this classification problem, I choose to use the Random Forest algorithm.
 
 I used the **createDataPartition()** function to split the data in two separated samples and used one for training the data and the other to validate the results. That way, we can see how the model performs in new data and detect any problem before put it on production.
 
-I started with a very small subset of the data to train the model faster, 10%, and pick the best one, after that, I trained the best model using 50% of the data to get a better accuracy.
+I started with a very small subset of the data to train the model faster, 10%, and pick the best one, after that, I trained the best model using 30% of the data to get a better accuracy.
 
 I used the **rfeControl** and **rfe** function, [Recursive Feature Elimination](http://topepo.github.io/caret/featureselection.html), to train the first model and rank the variables, since complex models take a long time to run and sometimes 
-the performance change are VERY small. And then, I plot it to see the results and pick the most important variables.
+the performance change are VERY small. And then, I plot the Accuracy x Variables to see the results and I choose to pick the 10 most important variables.
 
 ![FeatureSelection](featureSelection.png)
 
@@ -38,11 +156,16 @@ After taking a look at the graph, I choosed 10 variables to make the final model
 And then I made my final model:
 
 ```{r, eval = FALSE}
-modelFit.Best <- train(classe ~ 
-                         magnet_dumbbell_z + magnet_belt_z + pitch_forearm +
-                         roll_dumbbell + roll_forearm + gyros_belt_z +
-                         accel_forearm_x + yaw_dumbbell + roll_arm +
-                         gyros_dumbbell_y, data = train, 
+modelFit.Best <- train(classe ~ magnet_dumbbell_z    +
+                           roll_dumbbell        +
+                           pitch_forearm        +
+                           magnet_belt_z        +
+                           roll_forearm         +
+                           gyros_belt_z         +
+                           magnet_arm_x         +
+                           gyros_dumbbell_y     +
+                           total_accel_belt     +
+                           accel_forearm_x, data = train, 
                      method="rf", prox = TRUE, 
                      allowParallel = TRUE)
 ```
@@ -50,26 +173,26 @@ modelFit.Best <- train(classe ~
 And the results for the model are bellow:
 
 ```{r, eval=FALSE}
-Random Forest
+Random Forest 
 
-7850 samples
-  32 predictor
-   5 classes: 'A', 'B', 'C', 'D', 'E'
+5889 samples
+  33 predictor
+   5 classes: 'A', 'B', 'C', 'D', 'E' 
 
 No pre-processing
-Resampling: Bootstrapped (25 reps)
+Resampling: Bootstrapped (25 reps) 
 
-Summary of sample sizes: 7850, 7850, 7850, 7850, 7850, 7850, ...
+Summary of sample sizes: 5889, 5889, 5889, 5889, 5889, 5889, ... 
 
 Resampling results across tuning parameters:
 
-  mtry  Accuracy   Kappa      Accuracy SD  Kappa SD  
-   2    0.9383546  0.9219512  0.003503852  0.004448852
-   6    0.9305423  0.9120964  0.004701773  0.005988421
-  10    0.9148396  0.8922452  0.008830544  0.011210149
+  mtry  Accuracy   Kappa      Accuracy SD  Kappa SD   
+   2    0.9287708  0.9098260  0.005616632  0.007082752
+   6    0.9208420  0.8998129  0.006531468  0.008228253
+  10    0.9088271  0.8846037  0.007046107  0.008899502
 
 Accuracy was used to select the optimal model using  the largest value.
-The final value used for the model was mtry = 2.
+The final value used for the model was mtry = 2. 
 ```
 
 I used the default **Bootstrap Resampling** technique to **Cross Validate** the data besides K–fold Cross Validation.
@@ -78,65 +201,61 @@ According to John Kuhn, creator of the caret package, this procedure, bootstrap 
 
 You can find more about it at this paper [Predictive Modeling with R and the caret Package](http://www.edii.uclm.es/~useR-2013/Tutorials/kuhn/user_caret_2up.pdf)
 
-We can see that the model has an accuracy of ~93.8% and Kappa value of ~0.92 wich is considered pretty good.
+We can see that the model has an **Accuracy of ~93% and Kappa value of ~0.91** wich is considered pretty good.
 
-Since the model uses resampling, we can take a look of how it **estimates out of sample error** in unseen data, through the Out Of Bag (OOB) estimate of error, in this case **5.02%**
+Since the model uses resampling, we can take a look of how it **estimates out of sample error** in unseen data, through the Out Of Bag (OOB) estimate of error, in this case **6.25%**
 
 ```{r, eval = FALSE}
-> modelFit.Best$finalModel
-
 Call:
-randomForest(x = x, y = y, mtry = param$mtry, proximity = TRUE, allowParallel = TRUE)
+ randomForest(x = x, y = y, mtry = param$mtry, proximity = TRUE,      allowParallel = TRUE) 
                Type of random forest: classification
                      Number of trees: 500
 No. of variables tried at each split: 2
 
-        **OOB estimate of  error rate: 5.02%**
+        OOB estimate of  error rate: 6.25%
 Confusion matrix:
-     A    B    C    D    E class.error
-A 2202   14    6    9    1  0.01344086
-B   69 1384   49   12    5  0.08887426
-C    5   54 1258   47    5  0.08108108
-D    7    7   60 1205    8  0.06371406
-E    4    5   11   16 1407  0.02494802
+     A    B   C   D    E class.error
+A 1623   16  12  17    6  0.03046595
+B   44 1027  53  10    6  0.09912281
+C   22   49 940  14    2  0.08471276
+D   22    5  46 885    7  0.08290155
+E    4    5  13  15 1046  0.03416436
 ```
 
 We can validate the model accuracy using the test data and see the results using the confusionMatrix function:
 
 ```{r, eval = FALSE}
-> confusionMatrix(predict(modelFit.Best, newdata = test), test$classe)
-
 Confusion Matrix and Statistics
 
           Reference
 Prediction    A    B    C    D    E
-         A 3263   85   23    7    3
-         B   41 2090   65   10    9
-         C   13   75 1917  103   14
-         D   18   25   42 1794   17
-         E   13    3    6   15 2121
+         A 3813  113   36   40   10
+         B   42 2388   78   23   16
+         C   25  105 2253  143   40
+         D   15   44   20 2013   33
+         E   11    7    8   32 2425
 
 Overall Statistics
-                                       
-               Accuracy : 0.9501       
-                 95% CI : (0.946, 0.954)
-    No Information Rate : 0.2844       
-    P-Value [Acc > NIR] : < 2.2e-16    
-                                       
-                  Kappa : 0.9369       
-Mcnemar s Test P-Value : 9.171e-11    
+                                          
+               Accuracy : 0.9388          
+                 95% CI : (0.9346, 0.9427)
+    No Information Rate : 0.2844          
+    P-Value [Acc > NIR] : < 2.2e-16       
+                                          
+                  Kappa : 0.9225          
+ Mcnemar s Test P-Value : < 2.2e-16       
 
 Statistics by Class:
 
                      Class: A Class: B Class: C Class: D Class: E
-Sensitivity            0.9746   0.9175   0.9338   0.9300   0.9801
-Specificity            0.9860   0.9868   0.9789   0.9896   0.9961
-Pos Pred Value         0.9651   0.9436   0.9034   0.9462   0.9829
-Neg Pred Value         0.9899   0.9803   0.9859   0.9863   0.9955
+Sensitivity            0.9762   0.8988   0.9407   0.8943   0.9608
+Specificity            0.9797   0.9856   0.9724   0.9902   0.9948
+Pos Pred Value         0.9504   0.9376   0.8780   0.9473   0.9766
+Neg Pred Value         0.9904   0.9760   0.9873   0.9795   0.9912
 Prevalence             0.2844   0.1935   0.1744   0.1639   0.1838
-Detection Rate         0.2772   0.1775   0.1628   0.1524   0.1802
-Detection Prevalence   0.2872   0.1882   0.1803   0.1611   0.1833
-Balanced Accuracy      0.9803   0.9522   0.9563   0.9598   0.9881
+Detection Rate         0.2777   0.1739   0.1641   0.1466   0.1766
+Detection Prevalence   0.2921   0.1855   0.1868   0.1547   0.1808
+Balanced Accuracy      0.9780   0.9422   0.9566   0.9423   0.9778
 ```
 
 And we can see that the accuracy was even better with our test data, confirming the model statistics.
